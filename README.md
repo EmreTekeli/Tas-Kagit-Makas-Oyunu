@@ -1,4 +1,4 @@
-#Taş Kağıt Makas Oyunu
+#**Taş Kağıt Makas Oyunu**
 Bu basit bir taş kağıt makas oyunudur. Klasik oyunun biraz farklı bir versiyonu olarak, objeler (taş, kağıt, makas) div içerisinde hareket ederler ve birbirlerine dokunduklarında klasik oyun kuralları geçerlidir. Objelerin çıktılarına göre, en sonunda sadece bir çeşit obje kalmalı ve o kazanır.
 
 #Kurulum
