@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Taş Kağıt Makas Oyunu</title>
+    <style>
+      /* Resimleri istediğiniz gibi stilize edebilirsiniz */
+      .game-board {
+        position: relative;
+        width: 1000px;
+        height: 1000px;
+        border: 1px solid rgb(255, 255, 255);
+        margin: 0 auto; /* sol ve sağ kenarları otomatik olarak ayarlar */
+        background-color: #333; /* Arkaplan rengi */
+      }
+    
+      img {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        transition: transform 0.5s ease-out;
+      }
+    
+      body {
+        background-color: black;
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
+    
+      .result {
+        background-color: #333;
+        color: #fff;
+        font-size: 30px;
+        margin: 20px auto;
+        padding: 10px;
+        text-align: center;
+        width: 400px;
+      }
+
+      .button {
+      font-size: 16px;
+      margin: 20px auto;
+      display: block;
+      padding: 10px 20px;
+      background-color: #333;
+      color: white;
+      border: none;
+      cursor: pointer;
+      box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+    }
+
+
+    </style>
+    
+  </head>
+  <body>
+    <div class="game-board"></div>
+    <div class="result"></div>
+    <button class="button" id="startButton">Başlat</button>
+
+    <script>
+      const gameBoard = document.querySelector('.game-board');
+      const options = ['rock', 'paper', 'scissors'];
+
+     // Resimleri yükleme işlemi
+      function loadImages() {
+        const options = ['paper', 'rock', 'scissors'];
+
+        options.forEach(option => {
+          for (let i = 1; i <= 60; i++) {
+            const img = document.createElement('img');
+            img.src = `images/${option}.png`;
+            img.dataset.type = option;
+            img.dataset.id = i;
+            img.style.top = `${Math.random() * 950}px`;
+            img.style.left = `${Math.random() * 950}px`;
+            gameBoard.appendChild(img);
+          }
+        });
+      }
+
+
+      // Resimleri rastgele hareket ettirme işlemi
+      function moveImages() {
+        const images = gameBoard.querySelectorAll('img');
+
+        images.forEach(img => {
+          img.style.top = `${Math.random() * 950}px`;
+          img.style.left = `${Math.random() * 950}px`;
+        });
+      }
+
+      // Resimlerin çarpışma kontrolü
+      function checkCollision() {
+        const images = gameBoard.querySelectorAll('img');
+
+        images.forEach(img => {
+          images.forEach(img2 => {
+            if (img === img2) {
+              return;
+            }
+
+            const rect1 = img.getBoundingClientRect();
+            const rect2 = img2.getBoundingClientRect();
+
+            if (rect1.left < rect2.right &&
+                rect1.right > rect2.left &&
+                rect1.top < rect2.bottom &&
+                rect1.bottom > rect2.top) {
+              const type1 = img.dataset.type;
+              const type2 = img2.dataset.type;
+
+              if ((type1 === 'rock' && type2 === 'scissors') ||
+                  (type1 === 'paper' && type2 === 'rock') ||
+                  (type1 === 'scissors' && type2 === 'paper')) {
+                img2.src = `images/${type1}.png`;
+                img2.dataset.type = type1;
+              } else if ((type2 === 'rock' && type1 === 'scissors') ||
+                         (type2 === 'paper' && type1 === 'rock') ||
+                         (type2 === 'scissors' && type1 === 'paper')) {
+                img.src = `images/${type2}.png`;
+                img.dataset.type = type2;
+              }
+            }
+          });
+        });
+      }
+
+
+
+
+// Oyun döngüsünün kimliğini tutacak bir değişken
+var gameLoop;
+const result = document.querySelector('.result');
+
+function update(progress) {
+  // Oyunun durumunu güncelle
+}
+
+function draw() {
+  // Oyunun durumunu ekrana çiz
+}
+
+function loop(timestamp) {
+  var progress = timestamp - lastRender
+  update(progress)
+  draw()
+  lastRender = timestamp
+  window.requestAnimationFrame(loop)
+}
+
+var lastRender = 0
+window.requestAnimationFrame(loop)
+
+function checkWinner() {
+  const images = gameBoard.querySelectorAll('img');
+  const types = {
+    rock: 0,
+    paper: 0,
+    scissors: 0
+  };
+
+  images.forEach(img => {
+    types[img.dataset.type]++;
+  });
+
+  const values = Object.values(types);
+
+  if (values.every(value => value === 0)) {
+    result.textContent = 'Berabere!';
+    // Oyunu durdur
+    stopGame();
+  } else if (values.every(value => value === images.length)) {
+    const winner = images[0].dataset.type;
+    result.textContent = `Kazanan: ${winner}`;
+    // Oyunu durdur
+    stopGame();
+  } else {
+    const maxValue = Math.max(...values);
+    const winners = Object.keys(types).filter(key => types[key] === maxValue);
+    result.textContent = `Kazanan: ${winners.join(', ')}`;
+  }
+
+  const uniqueTypes = [...new Set(images.map(img => img.dataset.type))];
+  if (uniqueTypes.length === 1) {
+    result.textContent = `Oyun durdu! Tüm seçimler ${uniqueTypes[0]} olarak sonuçlandı.`;
+    // Oyunu durdur
+    stopGame();
+  }
+}
+
+
+
+const startButton = document.getElementById('startButton');
+startButton.addEventListener('click', startGame);
+
+function startGame() {
+  // Oyun döngüsünü başlat
+  gameLoop = setInterval(() => {
+    moveImages();
+    checkCollision();
+    checkWinner();
+  }, 900);
+}
+
+
+
+
+// Resimleri yükleme işlemini başlatma
+loadImages();
+
+// Oyunu durduran fonksiyon
+function stopGame() {
+  // Oyun döngüsünü iptal et
+  clearInterval(gameLoop);
+}
+
+</script>
+
+</body>
+</html>
